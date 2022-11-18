@@ -1,0 +1,205 @@
+{% macro bugs_table(bugs, mention_arches=False) -%}
+<div class="table-responsive">
+	<table class="table table-sm table-hover">
+		<thead>
+			<tr>
+				<th scope="col" style="width: 6ch">ID</th>
+				<th scope="col">Summary</th>
+				<th scope="col" style="width: 25ch">Assignee</th>
+				<th scope="col" style="width: 20ch">Reporter</th>
+				<th scope="col" style="width: 10ch">Opened</th>
+				<th scope="col" style="width: 10ch">Changed</th>
+			</tr>
+		</thead>
+		<tbody>
+			{% for bug in bugs %}
+				<tr>
+					<td><a href="https://bugs.gentoo.org/{{ bug['id'] }}">{{ bug['id'] }}</a></td>
+					<td>
+						{{ bug['summary'] }}
+						{% if 'SECURITY' in bug['keywords'] %}
+							<span class="badge text-bg-danger" data-bs-toggle="tooltip" data-bs-title="Security">S</span>
+						{% endif %}
+						{% if 'ALLARCHES' in bug['keywords'] %}
+							<span class="badge text-bg-info" data-bs-toggle="tooltip" data-bs-title="ALLARCHES">A</span>
+						{% endif %}
+						{% if bug['depends_on'].intersection(b.dependencies.keys()) %}
+							<span class="badge text-bg-warning" data-bs-toggle="tooltip" data-bs-title="Blocked">B</span>
+						{% endif %}
+						{% if bug['cf_runtime_testing_required'] == 'Manual' %}
+							<span class="badge text-bg-secondary" data-bs-toggle="tooltip" data-bs-title="Manual Testing">M</span>
+						{% endif %}
+						{% if mention_arches %}
+							<br />
+							<span>
+								{% for arch in bug['arches'] %}
+									<span class="badge text-bg-secondary">{{ arch }}</span>
+								{% endfor %}
+							</span>
+						{% endif %}
+					</td>
+					<td>
+						{% if bug['assigned_to'].startswith('maintainer-needed') %}
+							-
+						{% else %}
+							<a href="mailto:{{ bug['assigned_to'] }}">
+								{{ bug['assigned_to_detail']['real_name'] or bug['assigned_to_detail']['name'] }}
+							</a>
+						{% endif %}
+					</td>
+					<td>
+						<a href="mailto:{{ bug['creator'] }}">
+							{{ bug['creator_detail']['real_name'] or bug['creator_detail']['name'] }}
+						</a>
+					</td>
+					<td>{{ bug['creation_time'].strftime('%Y-%m-%d') }}</td>
+					<td>{{ bug['last_change_time'].strftime('%Y-%m-%d') }}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
+</div>
+{%- endmacro %}
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+
+		<title>Arch Testing Report</title>
+		<!-- Bootstrap CSS -->
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+		<style>
+			table.table-fit {
+				width: auto !important;
+				table-layout: auto !important;
+			}
+			table.table-fit thead th, table.table-fit tfoot th {
+				width: auto !important;
+			}
+			table.table-fit tbody td, table.table-fit tfoot td {
+				width: auto !important;
+			}
+		</style>
+	</head>
+	<body>
+		<nav class="navbar sticky-top navbar-expand-lg bg-light">
+			<div class="container-fluid">
+				<a class="navbar-brand">Arch Testing Report</a>
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarSupportedContent">
+					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+						<li class="nav-item">
+							<a class="nav-link active" href="#stats">Statistics</a>
+						</li>
+						<li class="nav-item dropdown">
+							<a class="nav-link active dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+								Last Arches
+							</a>
+							<ul class="dropdown-menu">
+								{% for arch, bugs in b.last_arch.items() %}
+									{% if bugs|length %}
+										<li>
+											<a class="dropdown-item" href="#last_arch_{{ arch }}">
+												{{ arch }} ({{ bugs|length }} bugs)
+											</a>
+										</li>
+									{% endif %}
+								{% endfor %}
+							</ul>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link active" href="#security_bugs">Security Bugs</a>
+						</li>
+						<li class="nav-item">
+							<a class="nav-link active" href="#inactive_bugs">Inactive Bugs</a>
+						</li>
+					</ul>
+				</div>
+				<div>
+					Generated at {{ now.strftime('%Y-%m-%d %H:%M:%S') }} UTC
+				</div>
+			</div>
+		</nav>
+
+		<div class="container">
+			<h2 id="stats">Statistics</h2>
+			<div class="card mb-3">
+				<div class="card-body">
+					<div class="table-responsive">
+						<table class="table table-hover table-fit">
+							<thead>
+								<tr>
+									<th scope="col">Arch</th>
+									<th scope="col">Total</th>
+									<th scope="col">Stablereqs</th>
+									<th scope="col">Keywording</th>
+									<th scope="col">Blocked</th>
+								</tr>
+							</thead>
+							<tbody>
+								{% for arch, stats in b.arch_stats.items() %}
+									<tr>
+										<td>{{ arch }}</td>
+										{% for stat in stats %}
+											<td>{{ stat }}</td>
+										{% endfor %}
+									</tr>
+								{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="container">
+			<h2>Last Arches</h2>
+			<p>
+				For every arch, list all bugs for which the arch is the last one not done. Those bugs should be prioritized for testing.
+			</p>
+			{% for arch, bugs in b.last_arch.items() %}
+				{% if bugs|length %}
+					<div class="card mb-3" id="last_arch_{{ arch }}">
+						<div class="card-header">{{ arch }} ({{ bugs|length }} bugs)</div>
+						<div class="card-body">
+							{{ bugs_table(bugs) }}
+						</div>
+					</div>
+				{% endif %}
+			{% endfor %}
+		</div>
+
+		<div class="container">
+			<h2 id="security_bugs">Security Bugs ({{ b.security_bugs|length }} bugs)</h2>
+			<p>
+				Security bugs are bugs with the keyword SECURITY.
+			</p>
+			<div class="card mb-3">
+				<div class="card-body">
+					{{ bugs_table(b.security_bugs) }}
+				</div>
+			</div>
+		</div>
+
+		<div class="container">
+			<h2 id="inactive_bugs">Inactive Bugs ({{ b.inactive_bugs|length }} bugs)</h2>
+			<p>
+				Bugs with no activity for {{ b.inactive_threshold }} days, and aren't blocked by unresolved bugs.
+			</p>
+			<div class="card mb-3">
+				<div class="card-body">
+					{{ bugs_table(b.inactive_bugs, mention_arches=True) }}
+				</div>
+			</div>
+		</div>
+		<!-- Bootstrap JS -->
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
+		<script>
+			const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+			const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+		</script>
+	</body>
+</html>
