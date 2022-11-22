@@ -118,6 +118,9 @@
 						<li class="nav-item">
 							<a class="nav-link active" href="#inactive_bugs">Inactive Bugs</a>
 						</li>
+						<li class="nav-item">
+							<a class="nav-link active" href="#bad_sanity_bugs">Bad sanity-check</a>
+						</li>
 					</ul>
 				</div>
 				<div>
@@ -177,7 +180,6 @@
 				{% endif %}
 			{% endfor %}
 		</div>
-
 		<div class="container">
 			<h2 id="security_bugs">Security Bugs ({{ b.security_bugs|length }} bugs)</h2>
 			<p>
@@ -189,7 +191,6 @@
 				</div>
 			</div>
 		</div>
-
 		<div class="container">
 			<h2 id="inactive_bugs">Inactive Bugs ({{ b.inactive_bugs|length }} bugs)</h2>
 			<p>
@@ -198,6 +199,17 @@
 			<div class="card mb-3">
 				<div class="card-body">
 					{{ bugs_table(b.inactive_bugs, mention_arches=True, skip_badges='I') }}
+				</div>
+			</div>
+		</div>
+		<div class="container">
+			<h2 id="bad_sanity_bugs">Bad sanity-check bugs ({{ b.bad_sanity|length }} bugs)</h2>
+			<p>
+				Bugs with bad sanity-check marked by nattka. For those, the package-list should be fixed.
+			</p>
+			<div class="card mb-3">
+				<div class="card-body">
+					{{ bugs_table(b.bad_sanity, mention_arches=True, skip_badges='IB') }}
 				</div>
 			</div>
 		</div>

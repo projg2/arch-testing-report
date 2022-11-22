@@ -107,6 +107,16 @@ class Bugzilla:
                 arches[arch] = tuple(map(operator.add, arches[arch], vec))
         return arches
 
+    @cached_property
+    def bad_sanity(self) -> tuple[dict[str, Any], ...]:
+        logging.info('Fetching all bad sanity bugs')
+        json = self.get('bug',
+                        resolution=['---'],
+                        f1=['flagtypes.name'],
+                        o1=['anywords'],
+                        v1=['sanity-check-'],)
+        return tuple(map(self.transform_bug, json['bugs']))
+
 def main():
     parser = argparse.ArgumentParser('crawler')
     parser.add_argument('template', metavar='TEMPLATE',
@@ -124,5 +134,6 @@ def main():
     ))
 
 if __name__ == '__main__':
-    logging.basicConfig(format='{asctime} | [{levelname}] {message}', style='{', level=logging.INFO, datefmt="%Y-%m-%d %H:%M:%S")
+    logging.basicConfig(format='{asctime} | [{levelname}] {message}', style='{',
+                        level=logging.INFO, datefmt="%Y-%m-%d %H:%M:%S")
     main()
