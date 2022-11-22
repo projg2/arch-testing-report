@@ -1,4 +1,4 @@
-{% macro bugs_table(bugs, mention_arches=False) -%}
+{% macro bugs_table(bugs, mention_arches=False, skip_badges='') -%}
 <div class="table-responsive">
 	<table class="table table-sm table-hover">
 		<thead>
@@ -17,16 +17,18 @@
 					<td><a href="https://bugs.gentoo.org/{{ bug['id'] }}">{{ bug['id'] }}</a></td>
 					<td>
 						{{ bug['summary'] }}
-						{% if 'SECURITY' in bug['keywords'] %}
+						{% if 'SECURITY' in bug['keywords'] and 'S' not in skip_badges %}
 							<span class="badge text-bg-danger" data-bs-toggle="tooltip" data-bs-title="Security">S</span>
 						{% endif %}
-						{% if 'ALLARCHES' in bug['keywords'] %}
+						{% if 'ALLARCHES' in bug['keywords'] and 'A' not in skip_badges %}
 							<span class="badge text-bg-info" data-bs-toggle="tooltip" data-bs-title="ALLARCHES">A</span>
 						{% endif %}
-						{% if bug['depends_on'].intersection(b.dependencies.keys()) %}
+						{% if bug['depends_on'].intersection(b.dependencies.keys()) and 'B' not in skip_badges %}
 							<span class="badge text-bg-warning" data-bs-toggle="tooltip" data-bs-title="Blocked">B</span>
+						{% elif bug['last_change_time'] < b.inactive_date and 'I' not in skip_badges %}
+							<span class="badge text-bg-secondary" data-bs-toggle="tooltip" data-bs-title="Inactive">I</span>
 						{% endif %}
-						{% if bug['cf_runtime_testing_required'] == 'Manual' %}
+						{% if bug['cf_runtime_testing_required'] == 'Manual' and 'M' not in skip_badges %}
 							<span class="badge text-bg-secondary" data-bs-toggle="tooltip" data-bs-title="Manual Testing">M</span>
 						{% endif %}
 						{% if mention_arches %}
@@ -179,7 +181,7 @@
 			</p>
 			<div class="card mb-3">
 				<div class="card-body">
-					{{ bugs_table(b.security_bugs) }}
+					{{ bugs_table(b.security_bugs, mention_arches=True, skip_badges='S') }}
 				</div>
 			</div>
 		</div>
@@ -191,7 +193,7 @@
 			</p>
 			<div class="card mb-3">
 				<div class="card-body">
-					{{ bugs_table(b.inactive_bugs, mention_arches=True) }}
+					{{ bugs_table(b.inactive_bugs, mention_arches=True, skip_badges='I') }}
 				</div>
 			</div>
 		</div>
