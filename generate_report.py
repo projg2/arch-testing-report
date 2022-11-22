@@ -10,11 +10,12 @@ from typing import Any
 import jinja2
 import requests
 
-ARCHES = ('amd64', 'arm', 'arm64', 'hppa', 'ia64', 'ppc', 'ppc64', 'riscv', 's390', 'sparc', 'x86')
-ARCHES_EMAILS = frozenset(f'{arch}@gentoo.org' for arch in ARCHES)
-
 class Bugzilla:
+    ARCHES = ('amd64', 'arm', 'arm64', 'hppa', 'ia64', 'ppc', 'ppc64', 'riscv', 's390', 'sparc', 'x86')
+    ARCHES_EMAILS = frozenset(f'{arch}@gentoo.org' for arch in ARCHES)
+
     inactive_threshold = 14
+    inactive_date = datetime.utcnow() - timedelta(days=inactive_threshold)
 
     def __init__(self):
         self.api_key = self.read_api_key()
@@ -42,7 +43,7 @@ class Bugzilla:
         bug['last_change_time'] = datetime.fromisoformat(
             bug['last_change_time'].rstrip('Z'))
         bug['depends_on'] = frozenset(bug['depends_on'])
-        bug['arches'] = sorted(s.removesuffix('@gentoo.org') for s in ARCHES_EMAILS.intersection(bug.get("cc", ())))
+        bug['arches'] = sorted(s.removesuffix('@gentoo.org') for s in self.ARCHES_EMAILS.intersection(bug.get("cc", ())))
         return bug
 
     @cached_property
@@ -50,7 +51,7 @@ class Bugzilla:
         logging.info('Fetching all arches bugs')
         json = self.get('bug',
                         resolution=['---'],
-                        cc=[ARCHES_EMAILS],
+                        cc=[self.ARCHES_EMAILS],
                         f1=['flagtypes.name'],
                         o1=['anywords'],
                         v1=['sanity-check+'],)
@@ -73,8 +74,8 @@ class Bugzilla:
         return {
             arch: [
                 bug for bug in self.arches_bugs
-                if ARCHES_EMAILS.intersection(bug.get("cc", ())) == {f'{arch}@gentoo.org'}
-            ] for arch in ARCHES
+                if self.ARCHES_EMAILS.intersection(bug.get("cc", ())) == {f'{arch}@gentoo.org'}
+            ] for arch in self.ARCHES
         }
 
     @cached_property
@@ -86,15 +87,14 @@ class Bugzilla:
 
     @cached_property
     def inactive_bugs(self):
-        inactive = datetime.utcnow() - timedelta(days=self.inactive_threshold)
         return [
             bug for bug in self.arches_bugs
-            if bug['last_change_time'] < inactive and not bug['depends_on'].intersection(self.dependencies.keys())
+            if bug['last_change_time'] < self.inactive_date and not bug['depends_on'].intersection(self.dependencies.keys())
         ]
 
     @cached_property
     def arch_stats(self):
-        arches = {arch: (0, ) * 4 for arch in ARCHES}
+        arches = {arch: (0, ) * 4 for arch in self.ARCHES}
         for bug in self.arches_bugs:
             is_keywording = bug['component'] == 'Keywording'
             vec = (
