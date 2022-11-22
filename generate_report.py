@@ -18,11 +18,11 @@ class Bugzilla:
     inactive_date = datetime.utcnow() - timedelta(days=inactive_threshold)
 
     def __init__(self):
-        self.api_key = self.read_api_key()
+        self.api_key = self.__read_api_key()
         self.session = requests.Session()
 
     @staticmethod
-    def read_api_key():
+    def __read_api_key():
         try:
             with open('bugs.key', encoding='utf-8') as f:
                 return f.read().strip()
@@ -72,25 +72,25 @@ class Bugzilla:
     @cached_property
     def last_arch(self):
         return {
-            arch: [
+            arch: tuple(
                 bug for bug in self.arches_bugs
                 if self.ARCHES_EMAILS.intersection(bug.get("cc", ())) == {f'{arch}@gentoo.org'}
-            ] for arch in self.ARCHES
+            ) for arch in self.ARCHES
         }
 
     @cached_property
     def security_bugs(self):
-        return [
+        return tuple(
             bug for bug in self.arches_bugs
             if 'SECURITY' in bug['keywords']
-        ]
+        )
 
     @cached_property
     def inactive_bugs(self):
-        return [
+        return tuple(
             bug for bug in self.arches_bugs
             if bug['last_change_time'] < self.inactive_date and not bug['depends_on'].intersection(self.dependencies.keys())
-        ]
+        )
 
     @cached_property
     def arch_stats(self):
@@ -109,9 +109,11 @@ class Bugzilla:
 
 def main():
     parser = argparse.ArgumentParser('crawler')
-    parser.add_argument('template', metavar='TEMPLATE', type=argparse.FileType('r', encoding='utf-8'),
+    parser.add_argument('template', metavar='TEMPLATE',
+                        type=argparse.FileType('r', encoding='utf-8'),
                         help='Template to render')
-    parser.add_argument('-o', '--output', metavar='PATH', type=argparse.FileType('w', encoding='utf-8'),
+    parser.add_argument('-o', '--output', metavar='PATH',
+                        type=argparse.FileType('w', encoding='utf-8'),
                         help='output file')
     args = parser.parse_args()
 
