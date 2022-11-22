@@ -128,7 +128,7 @@
 
 		<div class="container">
 			<h2 id="stats">Statistics</h2>
-			<div class="card mb-3">
+			<div class="card mb-3" style="width: fit-content;">
 				<div class="card-body">
 					<div class="table-responsive">
 						<table class="table table-hover table-fit">
@@ -144,7 +144,11 @@
 							<tbody>
 								{% for arch, stats in b.arch_stats.items() %}
 									<tr>
-										<td>{{ arch }}</td>
+										<td>
+											<a href="https://bugs.gentoo.org/buglist.cgi?component=Keywording&component=Stabilization&component=Vulnerabilities&email1={{ arch }}%40gentoo.org&emailassigned_to1=1&emailcc1=1&emailtype1=substring&f1=flagtypes.name&query_format=advanced&resolution=---&v1=sanity-check%2B">
+												{{ arch }}
+											</a>
+										</td>
 										{% for stat in stats %}
 											<td>{{ stat }}</td>
 										{% endfor %}
