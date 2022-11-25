@@ -5,6 +5,7 @@ import logging
 import operator
 from datetime import datetime, timedelta
 from functools import cached_property
+from pathlib import Path
 from typing import Any
 
 import jinja2
@@ -119,16 +120,20 @@ class Bugzilla:
 
 def main():
     parser = argparse.ArgumentParser('crawler')
-    parser.add_argument('template', metavar='TEMPLATE',
-                        type=argparse.FileType('r', encoding='utf-8'),
+    parser.add_argument('template', metavar='TEMPLATE', type=Path,
                         help='Template to render')
     parser.add_argument('-o', '--output', metavar='PATH',
                         type=argparse.FileType('w', encoding='utf-8'),
                         help='output file')
     args = parser.parse_args()
 
-    template = jinja2.Template(args.template.read())
-    args.output.write(template.render(
+    env = jinja2.Environment(
+        loader=jinja2.FileSystemLoader(args.template.parent),
+        autoescape=True,
+        trim_blocks=True,
+        lstrip_blocks=True,
+    )
+    args.output.write(env.get_template(args.template.name).render(
         b=Bugzilla(),
         now=datetime.utcnow(),
     ))

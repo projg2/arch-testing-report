@@ -31,7 +31,7 @@
 						{% if bug['cf_runtime_testing_required'] == 'Manual' and 'M' not in skip_badges %}
 							<span class="badge text-bg-secondary" data-bs-toggle="tooltip" data-bs-title="Manual Testing">M</span>
 						{% endif %}
-						{% if mention_arches %}
+						{% if mention_arches and bug['arches'] %}
 							<br />
 							<span>
 								{% for arch in bug['arches'] %}
