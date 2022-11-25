@@ -67,9 +67,6 @@
 	<head>
 		<meta charset="utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
-
-		<title>Arch Testing Report</title>
-		<!-- Bootstrap CSS -->
 		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
 		<style>
 			table.table-fit {
@@ -83,21 +80,22 @@
 				width: auto !important;
 			}
 		</style>
+		<title>Arch Testing Report</title>
 	</head>
-	<body>
-		<nav class="navbar sticky-top navbar-expand-lg bg-light">
+	<body data-bs-spy="scroll" data-bs-target="#navbar-example2" data-bs-offset="0" class="scrollspy-example" tabindex="0">
+		<nav id="navbar" class="navbar sticky-top navbar-expand-lg bg-light">
 			<div class="container-fluid">
 				<a class="navbar-brand">Arch Testing Report</a>
-				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar_content" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
 					<span class="navbar-toggler-icon"></span>
 				</button>
-				<div class="collapse navbar-collapse" id="navbarSupportedContent">
-					<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+				<div class="collapse navbar-collapse" id="navbar_content">
+					<ul class="navbar-nav me-auto mb-2 mb-lg-0 nav-tabs">
 						<li class="nav-item">
-							<a class="nav-link active" href="#stats">Statistics</a>
+							<a class="nav-link" href="#stats">Statistics</a>
 						</li>
 						<li class="nav-item dropdown">
-							<a class="nav-link active dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+							<a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
 								Last Arches
 							</a>
 							<ul class="dropdown-menu">
@@ -113,13 +111,13 @@
 							</ul>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link active" href="#security_bugs">Security Bugs</a>
+							<a class="nav-link" href="#security_bugs">Security Bugs</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link active" href="#inactive_bugs">Inactive Bugs</a>
+							<a class="nav-link" href="#inactive_bugs">Inactive Bugs</a>
 						</li>
 						<li class="nav-item">
-							<a class="nav-link active" href="#bad_sanity_bugs">Bad sanity-check</a>
+							<a class="nav-link" href="#bad_sanity_bugs">Bad sanity-check</a>
 						</li>
 					</ul>
 				</div>
@@ -129,8 +127,8 @@
 			</div>
 		</nav>
 
-		<div class="container">
-			<h2 id="stats">Statistics</h2>
+		<div id="stats" class="container">
+			<h2>Statistics</h2>
 			<div class="card mb-3" style="width: fit-content;">
 				<div class="card-body">
 					<div class="table-responsive">
@@ -180,8 +178,8 @@
 				{% endif %}
 			{% endfor %}
 		</div>
-		<div class="container">
-			<h2 id="security_bugs">Security Bugs ({{ b.security_bugs|length }} bugs)</h2>
+		<div id="security_bugs" class="container">
+			<h2>Security Bugs ({{ b.security_bugs|length }} bugs)</h2>
 			<p>
 				Security bugs are bugs with the keyword SECURITY.
 			</p>
@@ -191,8 +189,8 @@
 				</div>
 			</div>
 		</div>
-		<div class="container">
-			<h2 id="inactive_bugs">Inactive Bugs ({{ b.inactive_bugs|length }} bugs)</h2>
+		<div id="inactive_bugs" class="container">
+			<h2>Inactive Bugs ({{ b.inactive_bugs|length }} bugs)</h2>
 			<p>
 				Bugs with no activity for {{ b.inactive_threshold }} days, and aren't blocked by unresolved bugs.
 			</p>
@@ -202,8 +200,8 @@
 				</div>
 			</div>
 		</div>
-		<div class="container">
-			<h2 id="bad_sanity_bugs">Bad sanity-check bugs ({{ b.bad_sanity|length }} bugs)</h2>
+		<div id="bad_sanity_bugs" class="container">
+			<h2>Bad sanity-check bugs ({{ b.bad_sanity|length }} bugs)</h2>
 			<p>
 				Bugs with bad sanity-check marked by nattka. For those, the package-list should be fixed.
 			</p>
@@ -213,7 +211,6 @@
 				</div>
 			</div>
 		</div>
-		<!-- Bootstrap JS -->
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3" crossorigin="anonymous"></script>
 		<script>
 			const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
