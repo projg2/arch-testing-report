@@ -13,6 +13,7 @@ import requests
 
 class Bugzilla:
     ARCHES = ('amd64', 'arm', 'arm64', 'hppa', 'ia64', 'ppc', 'ppc64', 'riscv', 's390', 'sparc', 'x86')
+    DEVBOXES = frozenset({'amd64', 'arm', 'arm64', 'hppa', 'ia64', 'ppc', 'ppc64', 's390', 'sparc', 'x86'})
     ARCHES_EMAILS = frozenset(f'{arch}@gentoo.org' for arch in ARCHES)
 
     inactive_threshold = 14
@@ -91,6 +92,13 @@ class Bugzilla:
         return tuple(
             bug for bug in self.arches_bugs
             if bug['last_change_time'] < self.inactive_date and not bug['depends_on'].intersection(self.dependencies.keys())
+        )
+
+    @cached_property
+    def for_devboxes(self):
+        return tuple(
+            bug for bug in self.arches_bugs
+            if self.DEVBOXES.intersection(bug['arches'])
         )
 
     @cached_property

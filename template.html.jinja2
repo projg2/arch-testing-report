@@ -117,6 +117,9 @@
 							<a class="nav-link" href="#inactive_bugs">Inactive Bugs</a>
 						</li>
 						<li class="nav-item">
+							<a class="nav-link" href="#devboxes_bugs">Devboxes</a>
+						</li>
+						<li class="nav-item">
 							<a class="nav-link" href="#bad_sanity_bugs">Bad sanity-check</a>
 						</li>
 					</ul>
@@ -197,6 +200,15 @@
 			<div class="card mb-3">
 				<div class="card-body">
 					{{ bugs_table(b.inactive_bugs, mention_arches=True, skip_badges='I') }}
+				</div>
+			</div>
+		</div>
+		<div id="devboxes_bugs" class="container">
+			<h2>Bugs for dev boxes ({{ b.for_devboxes|length }} bugs)</h2>
+			<p>Bugs for for arches we have a devbox accessible to Gentoo devs.</p>
+			<div class="card mb-3">
+				<div class="card-body">
+					{{ bugs_table(b.for_devboxes, mention_arches=True) }}
 				</div>
 			</div>
 		</div>
