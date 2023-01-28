@@ -120,6 +120,9 @@
 							<a class="nav-link" href="#devboxes_bugs">Devboxes</a>
 						</li>
 						<li class="nav-item">
+							<a class="nav-link" href="#missing_cc">Missing CC-ARCHES</a>
+						</li>
+						<li class="nav-item">
 							<a class="nav-link" href="#bad_sanity_bugs">Bad sanity-check</a>
 						</li>
 					</ul>
@@ -209,6 +212,17 @@
 			<div class="card mb-3">
 				<div class="card-body">
 					{{ bugs_table(b.for_devboxes, mention_arches=True) }}
+				</div>
+			</div>
+		</div>
+		<div id="missing_cc" class="container">
+			<h2>Missing CC-ARCHES ({{ b.waiting_maintainers|length }} bugs)</h2>
+			<p>
+				Bugs with bad sanity-check marked by nattka. For those, the package-list should be fixed.
+			</p>
+			<div class="card mb-3">
+				<div class="card-body">
+					{{ bugs_table(b.waiting_maintainers, skip_badges='M') }}
 				</div>
 			</div>
 		</div>

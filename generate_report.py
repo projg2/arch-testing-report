@@ -126,6 +126,19 @@ class Bugzilla:
                         v1=['sanity-check-'],)
         return tuple(map(self.transform_bug, json['bugs']))
 
+    @cached_property
+    def waiting_maintainers(self):
+        logging.info('Fetching all bugs waiting for maintainers')
+        json = self.get('bug',
+                        resolution=['---'],
+                        component=['Keywording', 'Stabilization'],
+                        f1=['flagtypes.name'],
+                        o1=['anywords'],
+                        v1=['sanity-check+'],
+                        keywords=['CC-ARCHES'],
+                        keywords_type=['nowords'])
+        return tuple(map(self.transform_bug, json['bugs']))
+
 def main():
     parser = argparse.ArgumentParser('crawler')
     parser.add_argument('template', metavar='TEMPLATE', type=Path,
