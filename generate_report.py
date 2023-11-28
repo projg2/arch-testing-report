@@ -12,7 +12,7 @@ import jinja2
 import requests
 
 class Bugzilla:
-    ARCHES = ('amd64', 'arm', 'arm64', 'hppa', 'ia64', 'ppc', 'ppc64', 'riscv', 's390', 'sparc', 'x86')
+    ARCHES = ('alpha', 'amd64', 'arm', 'arm64', 'hppa', 'ia64', 'mips', 'ppc', 'ppc64', 'riscv', 's390', 'sparc', 'x86')
     DEVBOXES = frozenset({'amd64', 'arm', 'arm64', 'hppa', 'ia64', 'ppc', 'ppc64', 's390', 'sparc', 'x86'})
     ARCHES_EMAILS = frozenset(f'{arch}@gentoo.org' for arch in ARCHES)
 
